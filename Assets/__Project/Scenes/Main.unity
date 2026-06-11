@@ -478,7 +478,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerCtrl
   m_fsms:
-  - m_startState: {fileID: 11400000, guid: ffa6aaa295197f845848719360058fa4, type: 2}
+  - m_subject: Layer 0
+    m_startState: {fileID: 11400000, guid: ffa6aaa295197f845848719360058fa4, type: 2}
+    m_note: Idle <-> Move
   m_charCtrl: {fileID: 461051934}
   animator: {fileID: 461051933}
   m_moveSpeed: 3
@@ -495,7 +497,7 @@ GameObject:
   - component: {fileID: 487346417}
   - component: {fileID: 487346416}
   m_Layer: 0
-  m_Name: Cube
+  m_Name: Model
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
