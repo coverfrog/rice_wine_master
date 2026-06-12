@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: manager
+  m_EditorClassIdentifier: Unity.Addressables.Editor::UnityEditor.AddressableAssets.Settings.AddressableAssetGroup
+  m_GroupName: manager
+  m_GUID: f10c818f6ae18d8488d46dd248f47527
+  m_SerializeEntries:
+  - m_GUID: 5c2c98b1217c46b4087ab5324aefd017
+    m_Address: Assets/__Project/Prefabs/Manager/SessionManager.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - manager
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 75da7834c3996b941a0f5045c388f312
+    m_Address: Assets/__Project/Prefabs/Manager/InputManager.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - manager
+    FlaggedDuringContentUpdateRestriction: 0
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: d8c5b808ee91e4042b6d2a76aeb5acf7, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 6f76cab8e18965d46bf3ea9c814c1bf5, type: 2}
+    - {fileID: 11400000, guid: 57c8f1777a4685b48b813c7fb7e36191, type: 2}

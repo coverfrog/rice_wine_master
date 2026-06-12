@@ -4,7 +4,9 @@ using Mirror;
 [RequireComponent(typeof(Status))]
 public class FSMCtrl : NetworkBehaviour
 {
-    public FSMGroup FsmGroup { get; private set; }
+    public FSMGroup FSMGroup { get; private set; }
+
+    [SyncVar] public InputContext BufferInputContext;
 
     #region : Status
 
@@ -33,11 +35,13 @@ public class FSMCtrl : NetworkBehaviour
         base.OnStartLocalPlayer();
 
         SetupFSM();
+        SetupInputs();
     }
 
     protected virtual void Update()
     {
         UpdateFSM();
+        UpdateInputs();
     }
 
     protected virtual void FixedUpdate()
@@ -59,83 +63,112 @@ public class FSMCtrl : NetworkBehaviour
         }
 
         // [base]
-        FsmGroup = new FSMGroup(this, layerLength: 1);
+        FSMGroup = new FSMGroup(this, layerLength: 1);
 
         // [0]
-        FsmGroup.AddState(0, FSMStateType.Idle, new FSMIdleState());
-        FsmGroup.AddState(0, FSMStateType.Move, new FSMMoveState());
-        FsmGroup.AddState(0, FSMStateType.Interact, new FSMInteractState());
+        FSMGroup.AddState(0, FSMStateType.Idle, new FSMIdleState());
+        FSMGroup.AddState(0, FSMStateType.Move, new FSMMoveState());
+        FSMGroup.AddState(0, FSMStateType.Interact, new FSMInteractState());
 
         // [idle]
-        FsmGroup.AddTransition(0, FSMStateType.Idle, FSMStateType.Move, () => 
-            GetInputMove().sqrMagnitude > 0.001f);
-        FsmGroup.AddTransition(0, FSMStateType.Idle, FSMStateType.Interact, () => 
+        FSMGroup.AddTransition(0, FSMStateType.Idle, FSMStateType.Move, () => 
+            GetInputMoveDirection().sqrMagnitude > 0.001f);
+        FSMGroup.AddTransition(0, FSMStateType.Idle, FSMStateType.Interact, () => 
             GetInputInteract() == true);
 
         // [move]
-        FsmGroup.AddTransition(0, FSMStateType.Move, FSMStateType.Idle, () => 
-            GetInputMove().sqrMagnitude == 0);
-        FsmGroup.AddTransition(0, FSMStateType.Move, FSMStateType.Interact, () => 
+        FSMGroup.AddTransition(0, FSMStateType.Move, FSMStateType.Idle, () => 
+            GetInputMoveDirection().sqrMagnitude == 0);
+        FSMGroup.AddTransition(0, FSMStateType.Move, FSMStateType.Interact, () => 
             GetInputInteract() == true);
 
         // [interact]
-        FsmGroup.AddTransition(0, FSMStateType.Interact, FSMStateType.Idle, () => 
+        FSMGroup.AddTransition(0, FSMStateType.Interact, FSMStateType.Idle, () => 
             GetInputInteract() == true);
 
         // [run]
-        FsmGroup.Run();
+        FSMGroup.Run();
+    }
+
+    protected virtual void SetupInputs()
+    {
+        // [return]
+        if (isLocalPlayer == false)
+        {
+            return;
+        }
+
+        // [base]
+        
     }
 
     protected virtual void SetupStatus()
     {
         // [base]
         Status.Setup(this);
-
     }
 
     protected virtual void UpdateFSM()
     {
-        if (FsmGroup == null)
+        if (FSMGroup == null)
         {
             return;
         }
 
-        FsmGroup.UpdateState();
+        FSMGroup.UpdateState();
+    }
+
+    protected virtual void UpdateInputs()
+    {
+        if (InputManager.Instance == null)
+        {
+            return;
+        }
+
+        BufferInputContext = InputManager.Instance.Context;
     }
 
     protected virtual void FixedUpdateFSM()
     {
-        if (FsmGroup == null)
+        if (FSMGroup == null)
         {
             return;
         }
 
-        FsmGroup.FixedUpdateState();
+        FSMGroup.FixedUpdateState();
     }
 
     protected virtual void LateUpdateFSM()
     {
-        if (FsmGroup == null)
+        if (FSMGroup == null)
         {
             return;
         }
 
-        FsmGroup.LateUpdateState();
+        FSMGroup.LateUpdateState();
     }
 
     #region : GetInput
 
-    protected virtual Vector3 GetInputMove()
+    protected virtual Vector3 GetInputMoveDirection()
     {
-        float h = Input.GetAxisRaw("Horizontal");
-        float v = Input.GetAxisRaw("Vertical");
+        Vector3 pointXZ = new(transform.position.x, 0, transform.position.z);
+        Vector3 moveGroundPointXZ = BufferInputContext.MoveGroundPoint;
 
-        return new Vector3(h, 0, v).normalized;
+        if (Vector3.Distance(pointXZ, moveGroundPointXZ) < 0.5f)
+            return Vector3.zero;
+
+        Vector3 direction = (moveGroundPointXZ - pointXZ).normalized;
+
+        if (direction.sqrMagnitude < 0.001f)
+            return Vector3.zero;
+
+        return direction;
     }
 
     protected virtual bool GetInputInteract()
     {
-        return Input.GetKeyDown(KeyCode.E);
+        return BufferInputContext.IsInteract;
     }
 
     #endregion
@@ -144,7 +177,7 @@ public class FSMCtrl : NetworkBehaviour
 
     public virtual void MoveUpdate(float deltaTime)
     {
-        transform.position += GetInputMove() * Status[StatType.MoveSpeed] * deltaTime; 
+        transform.position += deltaTime * Status[StatType.MoveSpeed] * GetInputMoveDirection();
     }
 
     #endregion
