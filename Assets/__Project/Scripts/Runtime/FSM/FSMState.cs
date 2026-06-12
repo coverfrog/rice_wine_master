@@ -16,4 +16,14 @@ public abstract class FSMState
     {
 
     }
+
+    public virtual void OnFixedUpdate(FSMCtrl ctrl)
+    {
+
+    }
+
+    public virtual void OnLateUpdate(FSMCtrl ctrl)
+    {
+
+    }
 }

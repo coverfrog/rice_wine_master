@@ -1,11 +1,14 @@
 using UnityEngine;
+using Mirror;
 
-public class FSMCtrl : MonoBehaviour
+public class FSMCtrl : NetworkBehaviour
 {
-    private FSMGroup m_fsmGroup;
+    public FSMGroup FsmGroup { get; private set; }
 
-    protected virtual void Awake()
+    public override void OnStartServer()
     {
+        base.OnStartServer();
+
         Setup();
     }
 
@@ -14,40 +17,105 @@ public class FSMCtrl : MonoBehaviour
         UpdateFSM();
     }
 
-    protected virtual void Setup()
+    protected virtual void FixedUpdate()
     {
-        SetupFSM(ref m_fsmGroup);
+        FixedUpdateFSM();
     }
 
-    protected virtual void SetupFSM(ref FSMGroup fsmGroup)
+    protected virtual void LateUpdate()
     {
-        fsmGroup = new FSMGroup();
-        fsmGroup.Setup(this, layerLength: 1);
+        LateUpdateFSM();
+    }
 
-        fsmGroup.AddState(0, FSMStateType.Idle, new FSMIdleState());
-        fsmGroup.AddState(0, FSMStateType.Move, new FSMMoveState());
+    protected virtual void Setup()
+    {
+        SetupFSM();
+    }
 
-        fsmGroup.AddTransition(0, FSMStateType.Idle, FSMStateType.Move, () => GetInputMovement().sqrMagnitude > 0.001f);
-        fsmGroup.AddTransition(0, FSMStateType.Move, FSMStateType.Idle, () => GetInputMovement().sqrMagnitude == 0);
+    protected virtual void SetupFSM()
+    {
+        // [base]
+        FsmGroup = new FSMGroup();
+        FsmGroup.Setup(this, layerLength: 1);
 
-        fsmGroup.Run();
+        // [0]
+        FsmGroup.AddState(0, FSMStateType.Idle, new FSMIdleState());
+        FsmGroup.AddState(0, FSMStateType.Move, new FSMMoveState());
+        FsmGroup.AddState(0, FSMStateType.Interact, new FSMInteractState());
+
+        // [idle]
+        FsmGroup.AddTransition(0, FSMStateType.Idle, FSMStateType.Move, () => 
+            GetInputMove().sqrMagnitude > 0.001f);
+        FsmGroup.AddTransition(0, FSMStateType.Idle, FSMStateType.Interact, () => 
+            GetInputInteract() == true);
+
+        // [move]
+        FsmGroup.AddTransition(0, FSMStateType.Move, FSMStateType.Idle, () => 
+            GetInputMove().sqrMagnitude == 0);
+        FsmGroup.AddTransition(0, FSMStateType.Move, FSMStateType.Interact, () => 
+            GetInputInteract() == true);
+
+        // [interact]
+        FsmGroup.AddTransition(0, FSMStateType.Interact, FSMStateType.Idle, () => 
+            GetInputInteract() == true);
+
+        // [run]
+        FsmGroup.Run();
     }
 
     protected virtual void UpdateFSM()
     {
-        if (m_fsmGroup == null)
+        if (FsmGroup == null)
         {
             return;
         }
 
-        m_fsmGroup.UpdateState();
+        FsmGroup.UpdateState();
     }
 
-    private Vector3 GetInputMovement()
+    protected virtual void FixedUpdateFSM()
+    {
+        if (FsmGroup == null)
+        {
+            return;
+        }
+
+        FsmGroup.FixedUpdateState();
+    }
+
+    protected virtual void LateUpdateFSM()
+    {
+        if (FsmGroup == null)
+        {
+            return;
+        }
+
+        FsmGroup.LateUpdateState();
+    }
+
+    #region : GetInput
+
+    private Vector3 GetInputMove()
     {
         float h = Input.GetAxisRaw("Horizontal");
         float v = Input.GetAxisRaw("Vertical");
 
         return new Vector3(h, 0, v).normalized;
     }
+
+    private bool GetInputInteract()
+    {
+        return Input.GetKeyDown(KeyCode.E);
+    }
+
+    #endregion
+
+    #region : HelperMethod
+
+    public void MoveUpdate()
+    {
+        Debug.Log("Move");
+    }
+
+    #endregion
 }

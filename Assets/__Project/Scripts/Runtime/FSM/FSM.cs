@@ -42,6 +42,8 @@ public class FSM
             return;
         }
 
+        StateDict[CurrentStateType].OnUpdate(Ctrl);
+
         foreach (FSMCondition condition in ConditionDict[CurrentStateType])
         {
             if (condition.Condition())
@@ -49,6 +51,17 @@ public class FSM
                 ChangeState(condition.ToType);
             }
         }
+    }
+
+    public void FixedUpdateState()
+    {
+        StateDict[CurrentStateType].OnFixedUpdate(Ctrl);
+
+    }
+
+    public void LateUpdateState()
+    {
+        StateDict[CurrentStateType].OnLateUpdate(Ctrl);
     }
 
     public void Run()

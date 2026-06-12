@@ -38,6 +38,22 @@ public class FSMGroup
         }
     }
 
+    public void FixedUpdateState()
+    {
+        foreach (FSM fsm in FSMDict.Values)
+        {
+            fsm.FixedUpdateState();
+        }
+    }
+
+    public void LateUpdateState()
+    {
+        foreach (FSM fsm in FSMDict.Values)
+        {
+            fsm.LateUpdateState();
+        }
+    }
+
     public void Run()
     {
         foreach (FSM fsm in FSMDict.Values)
