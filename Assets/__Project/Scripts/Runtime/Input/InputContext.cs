@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using Mirror;
 
 [Serializable]
 public struct InputContext

@@ -6,7 +6,8 @@ public class FSMCtrl : NetworkBehaviour
 {
     public FSMGroup FSMGroup { get; private set; }
 
-    [SyncVar] public InputContext BufferInputContext;
+    [SyncVar(hook = nameof(HookInputContext))] 
+    public InputContext BufferInputContext;
 
     #region : Status
 
@@ -23,6 +24,8 @@ public class FSMCtrl : NetworkBehaviour
 
     #endregion
 
+    #region : Mirror
+
     public override void OnStartServer()
     {
         base.OnStartServer();
@@ -37,6 +40,10 @@ public class FSMCtrl : NetworkBehaviour
         SetupFSM();
         SetupInputs();
     }
+
+    #endregion
+
+    #region : Unity
 
     protected virtual void Update()
     {
@@ -53,6 +60,8 @@ public class FSMCtrl : NetworkBehaviour
     {
         LateUpdateFSM();
     }
+
+    #endregion
 
     protected virtual void SetupFSM()
     {
@@ -178,6 +187,25 @@ public class FSMCtrl : NetworkBehaviour
     public virtual void MoveUpdate(float deltaTime)
     {
         transform.position += deltaTime * Status[StatType.MoveSpeed] * GetInputMoveDirection();
+    }
+
+    #endregion
+
+    #region : Hook
+
+    public virtual void HookInputContext(InputContext oldValue, InputContext newValue)
+    {
+        if (isLocalPlayer == true)
+        {
+            if (oldValue.InteractID != newValue.InteractID)
+            {
+                Debug.Log(newValue.InteractID);
+            }
+        }
+        else
+        {
+
+        }
     }
 
     #endregion
