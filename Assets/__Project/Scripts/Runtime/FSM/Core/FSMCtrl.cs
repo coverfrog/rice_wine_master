@@ -12,6 +12,7 @@ public abstract class FSMCtrl : MonoBehaviour
 
     [Header("Value")]
     [SerializeField] private float m_moveSpeed = 3.0f;
+    [SerializeField] private float m_rotationSpeed = 20.0f;
 
     #region Start
 
@@ -62,17 +63,22 @@ public abstract class FSMCtrl : MonoBehaviour
 
     public Vector3 GetInputDirection()
     {
-        float horizontal = Input.GetAxisRaw("Horizontal");
-        float vertical = Input.GetAxisRaw("Vertical");
-        return new Vector3(horizontal, 0f, vertical).normalized;
+        float h = Input.GetAxisRaw("Horizontal");
+        float v = Input.GetAxisRaw("Vertical");
+
+        return new Vector3(h, 0f, v).normalized;
     }
     public void Move(Vector3 direction)
     {
-        m_charCtrl.Move(direction * m_moveSpeed * Time.deltaTime);
-        if (direction != Vector3.zero)
-        {
-            transform.forward = direction;
-        }
+        if (direction.sqrMagnitude < 0.001f)
+            return;
+
+        Vector3 moveVelocity = direction * m_moveSpeed;
+
+        Quaternion targetRotation = Quaternion.LookRotation(direction);
+        transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, m_rotationSpeed * Time.deltaTime);
+
+        m_charCtrl.Move(moveVelocity * Time.deltaTime);
     }
 
     #endregion

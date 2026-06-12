@@ -4,9 +4,7 @@ using UnityEngine;
 [Serializable]
 public class FSM
 {
-    [SerializeField] private string m_subject = "";
     [SerializeField] private FSMStateSO m_startState = null;
-    [SerializeField, TextArea] private string m_note = "";
 
     private FSMCtrl m_ctrl;
     private FSMStateSO m_currentState = null;
