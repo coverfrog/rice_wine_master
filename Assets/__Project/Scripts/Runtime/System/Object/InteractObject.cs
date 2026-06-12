@@ -5,17 +5,15 @@ using UnityEngine.Events;
 [RequireComponent(typeof(NetworkIdentity))]
 public class InteractObject : NetworkBehaviour
 {
-    [Header("Option")]
+    [Header("Interact")]
     [SyncVar] 
     public bool IsClickable = true;
 
-    [Header("Event")]
+    [Space]
     public UnityEvent<InteractObject> OnEnter;
 
-    public void Interact()
+    public virtual void Interact()
     {
-        Debug.Log("Interact");
-
         OnEnter?.Invoke(this);
     }
 }

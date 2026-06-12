@@ -1,17 +1,22 @@
 using UnityEngine;
 using Mirror;
-
 [RequireComponent(typeof(Status))]
+
+[RequireComponent(typeof(Rigidbody))]
+[RequireComponent(typeof(Inventory))]
 public class FSMCtrl : NetworkBehaviour
 {
     public FSMGroup FSMGroup { get; protected set; }
 
+    // [sync]
     [SyncVar(hook = nameof(HookInputContext))]
-    public FSMInputContext InputContext;
+    [HideInInspector] public FSMInputContext InputContext;
 
+
+    // [value]
     private RaycastHit[] m_interactHitResult = new RaycastHit[10];
 
-    #region : Status
+    #region : Component
 
     public Status Status
     {
@@ -24,6 +29,30 @@ public class FSMCtrl : NetworkBehaviour
 
     private Status m_status;
 
+
+    public Rigidbody Rb3d
+    {
+        get
+        {
+            if (m_rb3d == null) m_rb3d = GetComponent<Rigidbody>();
+            return m_rb3d;
+        }
+    }
+
+    private Rigidbody m_rb3d;
+
+
+    public Inventory Inventory
+    {
+        get
+        {
+            if (m_inventory == null) m_inventory = GetComponent<Inventory>();
+            return m_inventory;
+        }
+    }
+
+    private Inventory m_inventory;
+
     #endregion
 
     #region : Mirror
@@ -33,6 +62,7 @@ public class FSMCtrl : NetworkBehaviour
         base.OnStartServer();
 
         SetupStatus();
+        SetupInventory();
     }
 
     public override void OnStartLocalPlayer()
@@ -41,6 +71,7 @@ public class FSMCtrl : NetworkBehaviour
 
         SetupFSM();
         SetupInputs();
+        SetupCam();
     }
 
     #endregion
@@ -133,6 +164,25 @@ public class FSMCtrl : NetworkBehaviour
         InputManager.Instance.Clear();
     }
 
+    protected virtual void SetupInventory()
+    {
+        // [base]
+        Inventory.Setup(this);
+    }
+
+
+    protected virtual void SetupCam()
+    {
+        // [return]
+        if (isLocalPlayer == false)
+        {
+            return;
+        }
+
+        // [follow]
+        CamManager.Instance.Follow(transform);
+    }
+
     #endregion
 
     #region : Update
@@ -168,24 +218,24 @@ public class FSMCtrl : NetworkBehaviour
 
     protected virtual void UpdateInputsInteract()
     {
-        const float rayDistance = 5.0f;
+        const float rayDistance = 2.0f;
 
 #if UNITY_EDITOR
         Debug.DrawRay(transform.position, transform.forward * rayDistance, Color.red, 0.1f);
 #endif
 
-        if (InputManager.Instance.Context.IsInteract == false)
-        {
-            return;
-        }
+        FSMInputContext context = InputContext;
+        bool isInput = InputManager.Instance.Context.IsInteract;
 
         if (InputContext.InteractID == 0)
         {
-            uint interactID = 0;
             int hitCount = Physics.RaycastNonAlloc(transform.position, transform.forward, m_interactHitResult, maxDistance: rayDistance);
 
             if (hitCount == 0)
             {
+                context.InteractAble = false;
+                InputContext = context;
+
                 return;
             }
 
@@ -216,17 +266,27 @@ public class FSMCtrl : NetworkBehaviour
 
             if (interactObject != null)
             {
-                interactID = interactObject.netId;
-            }
+                context.InteractAble = true;
 
-            FSMInputContext context = InputContext;
-            context.InteractID = interactID;
+                if (isInput)
+                {
+                    context.InteractID = interactObject.netId;
+                }
+            }
+            else
+            {
+                context.InteractAble = false;
+            }
 
             InputContext = context;
         }
         else
         {
-            FSMInputContext context = InputContext;
+            if (isInput == false)
+            {
+                return;
+            }
+
             context.InteractID = 0;
 
             InputContext = context;
@@ -283,9 +343,9 @@ public class FSMCtrl : NetworkBehaviour
     {
         if (isLocalPlayer == true)
         {
-            if (oldValue.InteractID != newValue.InteractID)
+            if (oldValue.InteractAble != newValue.InteractAble)
             {
-                
+
             }
         }
         else

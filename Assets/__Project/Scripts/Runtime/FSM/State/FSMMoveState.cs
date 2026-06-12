@@ -6,11 +6,13 @@ public class FSMMoveState : FSMState
     {
     }
 
-    public override void OnUpdate()
+    public override void OnFixedUpdate()
     {
-        Ctrl.transform.position +=
-            Time.deltaTime *
-            Ctrl.Status[StatType.MoveSpeed] *
-            Ctrl.InputContext.MoveDirection;
+        Vector3 position = Ctrl.Rb3d.position +
+                        Time.deltaTime *
+                        Ctrl.Status[StatType.MoveSpeed] *
+                        Ctrl.InputContext.MoveDirection;
+
+        Ctrl.Rb3d.MovePosition(position);
     }
 }

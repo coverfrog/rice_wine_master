@@ -123,8 +123,10 @@ GameObject:
   - component: {fileID: 6522947412330487716}
   - component: {fileID: 1528943843014572687}
   - component: {fileID: 4403472746352966400}
+  - component: {fileID: -9146133851258377142}
+  - component: {fileID: -4461108282664748287}
   - component: {fileID: 9176758058585701029}
-  - component: {fileID: 768928033390677108}
+  - component: {fileID: 8903031329330431488}
   m_Layer: 0
   m_Name: PlayerCtrl
   m_TagString: Untagged
@@ -164,6 +166,7 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0
   InputContext:
+    InteractAble: 0
     InteractID: 0
     MoveDirection: {x: 0, y: 0, z: 0}
 --- !u!114 &4403472746352966400
@@ -181,6 +184,48 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
+--- !u!114 &-9146133851258377142
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4477828890553251621}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e230fc9bf4c27f84aa3f50629d452498, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Inventory
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+--- !u!54 &-4461108282664748287
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4477828890553251621}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 112
+  m_CollisionDetection: 0
 --- !u!114 &9176758058585701029
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -198,7 +243,7 @@ MonoBehaviour:
   serverOnly: 0
   visibility: 0
   hasSpawned: 0
---- !u!114 &768928033390677108
+--- !u!114 &8903031329330431488
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -207,9 +252,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 4477828890553251621}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8ff3ba0becae47b8b9381191598957c8, type: 3}
+  m_Script: {fileID: 11500000, guid: cb803efbe62c34d7baece46c9ffebad9, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Mirror.Components::Mirror.NetworkTransformReliable
+  m_EditorClassIdentifier: Mirror.Components::Mirror.NetworkRigidbodyReliable
   syncDirection: 1
   syncMode: 0
   syncInterval: 0
@@ -243,6 +288,7 @@ GameObject:
   - component: {fileID: 5068599180138132324}
   - component: {fileID: 1702192130038381823}
   - component: {fileID: 4507156732029879436}
+  - component: {fileID: 4120902235845648228}
   m_Layer: 0
   m_Name: Model
   m_TagString: Untagged
@@ -323,3 +369,24 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!65 &4120902235845648228
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5015686715835675968}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
