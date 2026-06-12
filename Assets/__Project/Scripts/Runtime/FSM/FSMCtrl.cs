@@ -7,7 +7,7 @@ public class FSMCtrl : NetworkBehaviour
     public FSMGroup FSMGroup { get; private set; }
 
     [SyncVar(hook = nameof(HookInputContext))] 
-    public InputContext BufferInputContext;
+    public FSMInputContext InputContext;
 
     #region : Status
 
@@ -47,21 +47,38 @@ public class FSMCtrl : NetworkBehaviour
 
     protected virtual void Update()
     {
+        if (isLocalPlayer == false)
+        {
+            return;
+        }
+
         UpdateFSM();
         UpdateInputs();
     }
 
     protected virtual void FixedUpdate()
     {
+        if (isLocalPlayer == false)
+        {
+            return;
+        }
+
         FixedUpdateFSM();
     }
 
     protected virtual void LateUpdate()
     {
+        if (isLocalPlayer == false)
+        {
+            return;
+        }
+
         LateUpdateFSM();
     }
 
     #endregion
+
+    #region : Setup
 
     protected virtual void SetupFSM()
     {
@@ -99,23 +116,24 @@ public class FSMCtrl : NetworkBehaviour
         FSMGroup.Run();
     }
 
-    protected virtual void SetupInputs()
-    {
-        // [return]
-        if (isLocalPlayer == false)
-        {
-            return;
-        }
-
-        // [base]
-        
-    }
-
     protected virtual void SetupStatus()
     {
         // [base]
         Status.Setup(this);
     }
+
+    protected virtual void SetupInputs()
+    {
+        // [base]
+        InputContext = new FSMInputContext();
+
+        // [clear]
+        InputManager.Instance.Clear();
+    }
+
+    #endregion
+
+    #region : Update
 
     protected virtual void UpdateFSM()
     {
@@ -134,8 +152,48 @@ public class FSMCtrl : NetworkBehaviour
             return;
         }
 
-        BufferInputContext = InputManager.Instance.Context;
+        UpdateInputsMoveDirection();
+        UpdateInputsInteract();
     }
+
+    protected virtual void UpdateInputsMoveDirection()
+    {
+        FSMInputContext context = InputContext;
+
+        Vector3 pointXZ = new(transform.position.x, 0, transform.position.z);
+        Vector3 moveGroundPointXZ = InputManager.Instance.Context.MoveGroundPoint;
+
+        if (Vector3.Distance(pointXZ, moveGroundPointXZ) < 0.5f)
+        {
+            context.MoveDirection = Vector3.zero;
+            InputContext = context;
+            return;
+        }
+
+        Vector3 direction = (moveGroundPointXZ - pointXZ).normalized;
+
+        if (direction.sqrMagnitude < 0.001f)
+        {
+            context.MoveDirection = Vector3.zero;
+            InputContext = context;
+            return;
+        }
+
+        context.MoveDirection = direction;
+        InputContext = context;
+    }
+
+    protected virtual void UpdateInputsInteract()
+    {
+        FSMInputContext context = InputContext;
+        context.InteractID = InputManager.Instance.Context.InteractID;
+
+        InputContext = context;
+    }
+
+    #endregion
+
+    #region : FixedUpdate
 
     protected virtual void FixedUpdateFSM()
     {
@@ -147,6 +205,10 @@ public class FSMCtrl : NetworkBehaviour
         FSMGroup.FixedUpdateState();
     }
 
+    #endregion
+
+    #region : LateUpdate
+
     protected virtual void LateUpdateFSM()
     {
         if (FSMGroup == null)
@@ -157,43 +219,25 @@ public class FSMCtrl : NetworkBehaviour
         FSMGroup.LateUpdateState();
     }
 
+#endregion
+
     #region : GetInput
 
     protected virtual Vector3 GetInputMoveDirection()
     {
-        Vector3 pointXZ = new(transform.position.x, 0, transform.position.z);
-        Vector3 moveGroundPointXZ = BufferInputContext.MoveGroundPoint;
-
-        if (Vector3.Distance(pointXZ, moveGroundPointXZ) < 0.5f)
-            return Vector3.zero;
-
-        Vector3 direction = (moveGroundPointXZ - pointXZ).normalized;
-
-        if (direction.sqrMagnitude < 0.001f)
-            return Vector3.zero;
-
-        return direction;
+        return InputContext.MoveDirection;
     }
 
     protected virtual bool GetInputInteract()
     {
-        return BufferInputContext.InteractID != 0;
-    }
-
-    #endregion
-
-    #region : HelperMethod
-
-    public virtual void MoveUpdate(float deltaTime)
-    {
-        transform.position += deltaTime * Status[StatType.MoveSpeed] * GetInputMoveDirection();
+        return InputContext.InteractID != 0;
     }
 
     #endregion
 
     #region : Hook
 
-    public virtual void HookInputContext(InputContext oldValue, InputContext newValue)
+    public virtual void HookInputContext(FSMInputContext oldValue, FSMInputContext newValue)
     {
         if (isLocalPlayer == true)
         {

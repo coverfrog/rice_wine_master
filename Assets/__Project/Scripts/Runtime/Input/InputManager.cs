@@ -48,6 +48,11 @@ public class InputManager : MonoBehaviour
         UpdateInputInteract();
     }
 
+    public void Clear()
+    {
+        Context = new InputContext();
+    }
+
     #region : Update Input
 
     private void UpdateInputMove()
@@ -75,29 +80,28 @@ public class InputManager : MonoBehaviour
 
         if (Physics.Raycast(ray, out RaycastHit hit, maxDistance: Mathf.Infinity) == false) return;
 
-        NetworkIdentity identity = null;
+        IInteract interact = null;
 
         if (hit.rigidbody != null &&
-            hit.rigidbody.TryGetComponent(out identity))
+            hit.rigidbody.TryGetComponent(out interact) == true)
         {
-
         }
 
-        if (identity == null)
+        if (interact == null)
         {
             if (hit.collider != null &&
-                hit.collider.TryGetComponent(out identity))
+                hit.collider.TryGetComponent(out interact))
             {
-
+            
             }
         }
 
-        if (identity == null)
+        if (interact == null)
         {
             return;
         }
 
-        context.InteractID = identity.netId;
+        context.InteractID = interact.GetNetID();
 
         Context = context;
     }

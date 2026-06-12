@@ -4,6 +4,9 @@ public class FSMMoveState : FSMState
 {
     public override void OnUpdate(FSMCtrl ctrl)
     {
-        ctrl.MoveUpdate(Time.deltaTime);
+        ctrl.transform.position +=
+            Time.deltaTime *
+            ctrl.Status[StatType.MoveSpeed] *
+            ctrl.InputContext.MoveDirection;
     }
 }
