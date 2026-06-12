@@ -1,3 +1,4 @@
+using Mirror;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
@@ -67,7 +68,36 @@ public class InputManager : MonoBehaviour
     private void UpdateInputInteract()
     {
         InputContext context = Context;
-        context.IsInteract = Input.GetKeyDown(KeyCode.E);
+
+        if (Input.GetMouseButtonDown(0) == false) return;
+
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+        if (Physics.Raycast(ray, out RaycastHit hit, maxDistance: Mathf.Infinity) == false) return;
+
+        NetworkIdentity identity = null;
+
+        if (hit.rigidbody != null &&
+            hit.rigidbody.TryGetComponent(out identity))
+        {
+
+        }
+
+        if (identity == null)
+        {
+            if (hit.collider != null &&
+                hit.collider.TryGetComponent(out identity))
+            {
+
+            }
+        }
+
+        if (identity == null)
+        {
+            return;
+        }
+
+        context.InteractID = identity.netId;
 
         Context = context;
     }

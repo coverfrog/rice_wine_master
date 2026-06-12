@@ -84,7 +84,7 @@ public class FSMCtrl : NetworkBehaviour
 
         // [interact]
         FSMGroup.AddTransition(0, FSMStateType.Interact, FSMStateType.Idle, () => 
-            GetInputInteract() == true);
+            GetInputInteract() == false);
 
         // [run]
         FSMGroup.Run();
@@ -168,7 +168,7 @@ public class FSMCtrl : NetworkBehaviour
 
     protected virtual bool GetInputInteract()
     {
-        return BufferInputContext.IsInteract;
+        return BufferInputContext.InteractID != 0;
     }
 
     #endregion

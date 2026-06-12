@@ -4,6 +4,6 @@ using UnityEngine;
 [Serializable]
 public struct InputContext
 {
-    public bool IsInteract;
+    public uint InteractID;
     public Vector3 MoveGroundPoint;
 }
