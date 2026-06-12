@@ -6,7 +6,8 @@ public class FSMCtrl : NetworkBehaviour
 {
     public FSMGroup FSMGroup { get; private set; }
 
-    [SyncVar(hook = nameof(HookInputContext))] 
+    [SyncVar(hook = nameof(HookInputContext))]
+    [HideInInspector]
     public FSMInputContext InputContext;
 
     #region : Status
@@ -163,7 +164,7 @@ public class FSMCtrl : NetworkBehaviour
         Vector3 pointXZ = new(transform.position.x, 0, transform.position.z);
         Vector3 moveGroundPointXZ = InputManager.Instance.Context.MoveGroundPoint;
 
-        if (Vector3.Distance(pointXZ, moveGroundPointXZ) < 0.5f)
+        if (Vector3.Distance(pointXZ, moveGroundPointXZ) < 0.2f)
         {
             context.MoveDirection = Vector3.zero;
             InputContext = context;

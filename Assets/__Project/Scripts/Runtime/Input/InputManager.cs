@@ -80,7 +80,7 @@ public class InputManager : MonoBehaviour
 
         if (Physics.Raycast(ray, out RaycastHit hit, maxDistance: Mathf.Infinity) == false) return;
 
-        IInteract interact = null;
+        InteractObject interact = null;
 
         if (hit.rigidbody != null &&
             hit.rigidbody.TryGetComponent(out interact) == true)
@@ -97,11 +97,11 @@ public class InputManager : MonoBehaviour
         }
 
         if (interact == null)
-        {
             return;
-        }
+        if (interact.IsClickable == false)
+            return;
 
-        context.InteractID = interact.GetNetID();
+        context.InteractID = interact.netId;
 
         Context = context;
     }

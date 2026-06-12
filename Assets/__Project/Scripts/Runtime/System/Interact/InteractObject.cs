@@ -2,12 +2,9 @@ using Mirror;
 using UnityEngine;
 
 [RequireComponent(typeof(NetworkIdentity))]
-public class InteractObject : NetworkBehaviour, IInteract
+public class InteractObject : NetworkBehaviour
 {
-    public uint GetNetID()
-    {
-        return netId;
-    }
+    [SyncVar] public bool IsClickable = true;
 
     public void Interact()
     {
