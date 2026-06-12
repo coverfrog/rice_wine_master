@@ -9,7 +9,7 @@ public class FSMGroup
 
     public Dictionary<int, FSM> FSMDict { get; private set; }
 
-    public void Setup(FSMCtrl ctrl, int layerLength)
+    public FSMGroup(FSMCtrl ctrl, int layerLength)
     {
         Ctrl = ctrl;
         FSMDict = new Dictionary<int, FSM>(capacity: layerLength);

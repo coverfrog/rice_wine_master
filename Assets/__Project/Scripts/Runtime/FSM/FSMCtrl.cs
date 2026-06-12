@@ -1,15 +1,38 @@
 using UnityEngine;
 using Mirror;
 
+[RequireComponent(typeof(Status))]
 public class FSMCtrl : NetworkBehaviour
 {
     public FSMGroup FsmGroup { get; private set; }
+
+    #region : Status
+
+    public Status Status
+    {
+        get
+        {
+            if (m_status == null) m_status = GetComponent<Status>();
+            return m_status;
+        }
+    }
+
+    private Status m_status;
+
+    #endregion
 
     public override void OnStartServer()
     {
         base.OnStartServer();
 
-        Setup();
+        SetupStatus();
+    }
+
+    public override void OnStartLocalPlayer()
+    {
+        base.OnStartLocalPlayer();
+
+        SetupFSM();
     }
 
     protected virtual void Update()
@@ -27,16 +50,16 @@ public class FSMCtrl : NetworkBehaviour
         LateUpdateFSM();
     }
 
-    protected virtual void Setup()
-    {
-        SetupFSM();
-    }
-
     protected virtual void SetupFSM()
     {
+        // [return]
+        if (isLocalPlayer == false)
+        {
+            return;
+        }
+
         // [base]
-        FsmGroup = new FSMGroup();
-        FsmGroup.Setup(this, layerLength: 1);
+        FsmGroup = new FSMGroup(this, layerLength: 1);
 
         // [0]
         FsmGroup.AddState(0, FSMStateType.Idle, new FSMIdleState());
@@ -61,6 +84,13 @@ public class FSMCtrl : NetworkBehaviour
 
         // [run]
         FsmGroup.Run();
+    }
+
+    protected virtual void SetupStatus()
+    {
+        // [base]
+        Status.Setup(this);
+
     }
 
     protected virtual void UpdateFSM()
@@ -95,7 +125,7 @@ public class FSMCtrl : NetworkBehaviour
 
     #region : GetInput
 
-    private Vector3 GetInputMove()
+    protected virtual Vector3 GetInputMove()
     {
         float h = Input.GetAxisRaw("Horizontal");
         float v = Input.GetAxisRaw("Vertical");
@@ -103,7 +133,7 @@ public class FSMCtrl : NetworkBehaviour
         return new Vector3(h, 0, v).normalized;
     }
 
-    private bool GetInputInteract()
+    protected virtual bool GetInputInteract()
     {
         return Input.GetKeyDown(KeyCode.E);
     }
@@ -112,9 +142,9 @@ public class FSMCtrl : NetworkBehaviour
 
     #region : HelperMethod
 
-    public void MoveUpdate()
+    public virtual void MoveUpdate(float deltaTime)
     {
-        Debug.Log("Move");
+        transform.position += GetInputMove() * Status[StatType.MoveSpeed] * deltaTime; 
     }
 
     #endregion
