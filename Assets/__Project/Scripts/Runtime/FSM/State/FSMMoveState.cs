@@ -2,11 +2,15 @@ using UnityEngine;
 
 public class FSMMoveState : FSMState
 {
-    public override void OnUpdate(FSMCtrl ctrl)
+    public FSMMoveState(FSMCtrl ctrl) : base(ctrl)
     {
-        ctrl.transform.position +=
+    }
+
+    public override void OnUpdate()
+    {
+        Ctrl.transform.position +=
             Time.deltaTime *
-            ctrl.Status[StatType.MoveSpeed] *
-            ctrl.InputContext.MoveDirection;
+            Ctrl.Status[StatType.MoveSpeed] *
+            Ctrl.InputContext.MoveDirection;
     }
 }

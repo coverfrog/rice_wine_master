@@ -42,7 +42,7 @@ public class FSM
             return;
         }
 
-        StateDict[CurrentStateType].OnUpdate(Ctrl);
+        StateDict[CurrentStateType].OnUpdate();
 
         foreach (FSMCondition condition in ConditionDict[CurrentStateType])
         {
@@ -55,13 +55,13 @@ public class FSM
 
     public void FixedUpdateState()
     {
-        StateDict[CurrentStateType].OnFixedUpdate(Ctrl);
+        StateDict[CurrentStateType].OnFixedUpdate();
 
     }
 
     public void LateUpdateState()
     {
-        StateDict[CurrentStateType].OnLateUpdate(Ctrl);
+        StateDict[CurrentStateType].OnLateUpdate();
     }
 
     public void Run()
@@ -73,13 +73,13 @@ public class FSM
 
         IsRun = true;
         CurrentStateType = StateDict.Keys.First();
-        StateDict[CurrentStateType].OnEnter(Ctrl);
+        StateDict[CurrentStateType].OnEnter();
     }
 
     public void ChangeState(FSMStateType to)
     {
-        StateDict[CurrentStateType].OnExit(Ctrl);
+        StateDict[CurrentStateType].OnExit();
         CurrentStateType = to;
-        StateDict[CurrentStateType].OnEnter(Ctrl);
+        StateDict[CurrentStateType].OnEnter();
     }
 }

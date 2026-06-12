@@ -2,27 +2,34 @@ using UnityEngine;
 
 public abstract class FSMState
 {
-    public virtual void OnEnter(FSMCtrl ctrl)
+    public FSMCtrl Ctrl { get; private set; }
+
+    public FSMState(FSMCtrl ctrl)
+    {
+        Ctrl = ctrl;
+    }
+
+    public virtual void OnEnter()
     {
 
     }
 
-    public virtual void OnExit(FSMCtrl ctrl)
+    public virtual void OnExit()
     {
 
     }
 
-    public virtual void OnUpdate(FSMCtrl ctrl)
+    public virtual void OnUpdate()
     {
 
     }
 
-    public virtual void OnFixedUpdate(FSMCtrl ctrl)
+    public virtual void OnFixedUpdate()
     {
 
     }
 
-    public virtual void OnLateUpdate(FSMCtrl ctrl)
+    public virtual void OnLateUpdate()
     {
 
     }

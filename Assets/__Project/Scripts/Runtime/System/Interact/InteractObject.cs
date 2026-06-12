@@ -8,6 +8,6 @@ public class InteractObject : NetworkBehaviour
 
     public void Interact()
     {
-        
+        Debug.Log("interact");
     }
 }

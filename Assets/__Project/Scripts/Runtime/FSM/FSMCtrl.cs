@@ -93,9 +93,9 @@ public class FSMCtrl : NetworkBehaviour
         FSMGroup = new FSMGroup(this, layerLength: 1);
 
         // [0]
-        FSMGroup.AddState(0, FSMStateType.Idle, new FSMIdleState());
-        FSMGroup.AddState(0, FSMStateType.Move, new FSMMoveState());
-        FSMGroup.AddState(0, FSMStateType.Interact, new FSMInteractState());
+        FSMGroup.AddState(0, FSMStateType.Idle, new FSMIdleState(this));
+        FSMGroup.AddState(0, FSMStateType.Move, new FSMMoveState(this));
+        FSMGroup.AddState(0, FSMStateType.Interact, new FSMInteractState(this));
 
         // [idle]
         FSMGroup.AddTransition(0, FSMStateType.Idle, FSMStateType.Move, () => 
@@ -244,7 +244,7 @@ public class FSMCtrl : NetworkBehaviour
         {
             if (oldValue.InteractID != newValue.InteractID)
             {
-                Debug.Log(newValue.InteractID);
+                
             }
         }
         else

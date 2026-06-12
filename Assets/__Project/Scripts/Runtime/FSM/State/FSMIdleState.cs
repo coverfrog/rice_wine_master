@@ -2,8 +2,12 @@ using UnityEngine;
 
 public class FSMIdleState : FSMState
 {
-    public override void OnEnter(FSMCtrl ctrl)
+    public FSMIdleState(FSMCtrl ctrl) : base(ctrl)
     {
-        base.OnEnter(ctrl);
+    }
+
+    public override void OnEnter()
+    {
+
     }
 }
