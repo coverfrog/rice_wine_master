@@ -57,15 +57,16 @@ public class InputManager : MonoBehaviour
 
     private void UpdateInputMove()
     {
-        if (Input.GetMouseButtonDown(1) == false) return;
+        float h = Input.GetAxisRaw("Horizontal");
+        float v = Input.GetAxisRaw("Vertical");
 
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        Vector3 movement = new Vector3(h, 0, v).normalized;
 
-        if (Physics.Raycast(ray, out RaycastHit hit, maxDistance: Mathf.Infinity, Config.GroundLayer) == false) return;
+        if (movement.sqrMagnitude < 0.001f) movement = Vector3.zero;
 
         InputContext context = Context;
-        context.MoveGroundPoint.x = hit.point.x;
-        context.MoveGroundPoint.z = hit.point.z;
+        context.MoveDirection.x = movement.x;
+        context.MoveDirection.z = movement.z;
 
         Context = context;
     }
@@ -73,35 +74,7 @@ public class InputManager : MonoBehaviour
     private void UpdateInputInteract()
     {
         InputContext context = Context;
-
-        if (Input.GetMouseButtonDown(0) == false) return;
-
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-
-        if (Physics.Raycast(ray, out RaycastHit hit, maxDistance: Mathf.Infinity) == false) return;
-
-        InteractObject interact = null;
-
-        if (hit.rigidbody != null &&
-            hit.rigidbody.TryGetComponent(out interact) == true)
-        {
-        }
-
-        if (interact == null)
-        {
-            if (hit.collider != null &&
-                hit.collider.TryGetComponent(out interact))
-            {
-            
-            }
-        }
-
-        if (interact == null)
-            return;
-        if (interact.IsClickable == false)
-            return;
-
-        context.InteractID = interact.netId;
+        context.IsInteract = Input.GetKeyDown(KeyCode.E);
 
         Context = context;
     }

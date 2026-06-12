@@ -4,11 +4,12 @@ using Mirror;
 [RequireComponent(typeof(Status))]
 public class FSMCtrl : NetworkBehaviour
 {
-    public FSMGroup FSMGroup { get; private set; }
+    public FSMGroup FSMGroup { get; protected set; }
 
     [SyncVar(hook = nameof(HookInputContext))]
-    [HideInInspector]
     public FSMInputContext InputContext;
+
+    private RaycastHit[] m_interactHitResult = new RaycastHit[10];
 
     #region : Status
 
@@ -98,19 +99,19 @@ public class FSMCtrl : NetworkBehaviour
         FSMGroup.AddState(0, FSMStateType.Interact, new FSMInteractState(this));
 
         // [idle]
-        FSMGroup.AddTransition(0, FSMStateType.Idle, FSMStateType.Move, () => 
+        FSMGroup.AddTransition(0, FSMStateType.Idle, FSMStateType.Move, () =>
             GetInputMoveDirection().sqrMagnitude > 0.001f);
-        FSMGroup.AddTransition(0, FSMStateType.Idle, FSMStateType.Interact, () => 
+        FSMGroup.AddTransition(0, FSMStateType.Idle, FSMStateType.Interact, () =>
             GetInputInteract() == true);
 
         // [move]
-        FSMGroup.AddTransition(0, FSMStateType.Move, FSMStateType.Idle, () => 
+        FSMGroup.AddTransition(0, FSMStateType.Move, FSMStateType.Idle, () =>
             GetInputMoveDirection().sqrMagnitude == 0);
-        FSMGroup.AddTransition(0, FSMStateType.Move, FSMStateType.Interact, () => 
+        FSMGroup.AddTransition(0, FSMStateType.Move, FSMStateType.Interact, () =>
             GetInputInteract() == true);
 
         // [interact]
-        FSMGroup.AddTransition(0, FSMStateType.Interact, FSMStateType.Idle, () => 
+        FSMGroup.AddTransition(0, FSMStateType.Interact, FSMStateType.Idle, () =>
             GetInputInteract() == false);
 
         // [run]
@@ -160,39 +161,79 @@ public class FSMCtrl : NetworkBehaviour
     protected virtual void UpdateInputsMoveDirection()
     {
         FSMInputContext context = InputContext;
+        context.MoveDirection = InputManager.Instance.Context.MoveDirection;
 
-        Vector3 pointXZ = new(transform.position.x, 0, transform.position.z);
-        Vector3 moveGroundPointXZ = InputManager.Instance.Context.MoveGroundPoint;
-
-        if (Vector3.Distance(pointXZ, moveGroundPointXZ) < 0.2f)
-        {
-            context.MoveDirection = Vector3.zero;
-            InputContext = context;
-            return;
-        }
-
-        Vector3 direction = (moveGroundPointXZ - pointXZ).normalized;
-
-        if (direction.sqrMagnitude < 0.001f)
-        {
-            context.MoveDirection = Vector3.zero;
-            InputContext = context;
-            return;
-        }
-
-        context.MoveDirection = direction;
         InputContext = context;
     }
 
     protected virtual void UpdateInputsInteract()
     {
-        FSMInputContext context = InputContext;
-        context.InteractID = InputManager.Instance.Context.InteractID;
+        const float rayDistance = 5.0f;
 
-        InputContext = context;
+#if UNITY_EDITOR
+        Debug.DrawRay(transform.position, transform.forward * rayDistance, Color.red, 0.1f);
+#endif
+
+        if (InputManager.Instance.Context.IsInteract == false)
+        {
+            return;
+        }
+
+        if (InputContext.InteractID == 0)
+        {
+            uint interactID = 0;
+            int hitCount = Physics.RaycastNonAlloc(transform.position, transform.forward, m_interactHitResult, maxDistance: rayDistance);
+
+            if (hitCount == 0)
+            {
+                return;
+            }
+
+            InteractObject interactObject = null;
+
+            for (int i = 0; i < hitCount; i++)
+            {
+                RaycastHit result = m_interactHitResult[i];
+
+                if (result.collider != null &&
+                    result.collider.transform.IsChildOf(transform) == true)
+                {
+                    continue;
+                }
+
+                if (result.rigidbody != null &&
+                    result.rigidbody.TryGetComponent(out interactObject) == true)
+                {
+                    break;
+                }
+
+                if (result.collider != null &&
+                    result.collider.TryGetComponent(out interactObject) == false)
+                {
+                    break;
+                }
+            }
+
+            if (interactObject != null)
+            {
+                interactID = interactObject.netId;
+            }
+
+            FSMInputContext context = InputContext;
+            context.InteractID = interactID;
+
+            InputContext = context;
+        }
+        else
+        {
+            FSMInputContext context = InputContext;
+            context.InteractID = 0;
+
+            InputContext = context;
+        }
     }
 
-    #endregion
+#endregion
 
     #region : FixedUpdate
 

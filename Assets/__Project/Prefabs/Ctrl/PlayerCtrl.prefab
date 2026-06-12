@@ -126,7 +126,7 @@ GameObject:
   - component: {fileID: 9176758058585701029}
   - component: {fileID: 768928033390677108}
   m_Layer: 0
-  m_Name: FSMCtrl
+  m_Name: PlayerCtrl
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -163,6 +163,9 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
+  InputContext:
+    InteractID: 0
+    MoveDirection: {x: 0, y: 0, z: 0}
 --- !u!114 &4403472746352966400
 MonoBehaviour:
   m_ObjectHideFlags: 0
