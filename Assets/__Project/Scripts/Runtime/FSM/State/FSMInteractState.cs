@@ -24,7 +24,13 @@ public class FSMInteractState : FSMState
             return;
         }
 
-        io.Interact();
+        io.Interact(() =>
+        {
+            FSMInputContext context = Ctrl.InputContext;
+            context.InteractID = 0;
+
+            Ctrl.InputContext = context;
+        });
     }
 
     private void Cancel()

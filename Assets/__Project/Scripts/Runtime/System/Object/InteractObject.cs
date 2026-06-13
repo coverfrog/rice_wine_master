@@ -1,4 +1,5 @@
 using Mirror;
+using System;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -9,11 +10,8 @@ public class InteractObject : NetworkBehaviour
     [SyncVar] 
     public bool IsClickable = true;
 
-    [Space]
-    public UnityEvent<InteractObject> OnEnter;
-
-    public virtual void Interact()
+    public virtual void Interact(Action actExit)
     {
-        OnEnter?.Invoke(this);
+
     }
 }

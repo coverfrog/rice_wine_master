@@ -1,16 +1,12 @@
 using UnityEngine;
 
-public class ItemData : MonoBehaviour
+[CreateAssetMenu]
+public class ItemData : ScriptableObject
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
+    [SerializeField] private ulong m_id;
+    [SerializeField] private string m_modelPath;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    public ulong ID => m_id;
+
+    public string ModelPath => m_modelPath;
 }
